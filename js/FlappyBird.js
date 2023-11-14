@@ -27,7 +27,7 @@ class FlappyBird extends Phaser.GameObjects.Sprite {
 			this.upwardsVelocity--;
 		}else{
 		if (this.angle < 90){
-			this.angle += 3;
+			this.angle += 0.5;
 			this.setAngle(this.angle);
 		}}
 		this.body.allowGravity = true;

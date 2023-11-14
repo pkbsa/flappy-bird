@@ -58,7 +58,7 @@ class FlappyBirdScene extends Phaser.Scene {
 			frameHeight: 112
 		});
 
-		this.load.image(assets.scene.startGame, 'assets/startgame.png');
+		this.load.image(assets.scene.startGame, 'assets/startgame1.png');
 		this.load.image(assets.scene.gameOver, 'assets/gameover.png');
 		this.load.image(assets.scene.restartGame, 'assets/restart-button.png');
 		this.load.image(assets.scene.leaderBoard, 'assets/leaderboard-button.png');
@@ -71,7 +71,7 @@ class FlappyBirdScene extends Phaser.Scene {
 
 		Object.keys(assets.bird).forEach(function(key){
 			let bird = assets.bird[key].name;
-			game.load.spritesheet(bird, `assets/${bird}-sprite.png`, {
+			game.load.spritesheet(bird, `assets/bird-gluay-re.png`, {
 				frameWidth: 34,
 				frameHeight: 24
 			});
@@ -228,7 +228,7 @@ class FlappyBirdScene extends Phaser.Scene {
 
 		this.nextPipes++;
 
-		if (this.nextPipes === 130){
+		if (this.nextPipes === 250){
 			this.makePipes();
 			this.nextPipes = 0;
 		}
