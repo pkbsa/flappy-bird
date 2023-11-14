@@ -7,10 +7,36 @@
 }
 
 body{
+    display: flex;
     background: #fff;
     padding: 0px;
     margin: 0px;
+    justify-content: center;
+    align-items: center;
 }
+.full{
+    position: absolute;
+    z-index: 3;
+    background-color: #5DBD39;
+    padding: 2em;
+    border-radius: 30px;
+    font-family: 'Noto Sans Thai', sans-serif;
+    font-family: 'Sarabun', sans-serif;
+}
+input{
+    min-height: 50px;
+}
+label{
+    color: rgb(255, 255, 255);
+    font-size: 1.2em;
+}
+.start{
+    background-color: white!important;
+}
+ol {
+    list-style: none;
+    padding: 0;
+  }
 
 canvas{
     display:block;
@@ -19,4 +45,6 @@ canvas{
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    filter: grayscale(100%); /* Set initial grayscale effect */
+    pointer-events: none; /* Make the canvas not clickable by default */
 }

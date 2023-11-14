@@ -1,13 +1,86 @@
 <!DOCTYPE html>
 <html>
-	<title>Flappy Bird</title>
-	<head>
-		<link rel="shortcut icon" href="assets/flappy.ico" />
-        <link rel="stylesheet" type="text/css" href="game.css">
-        <script type="text/javascript" src="phaser.min.js"></script>
-        <script type="module" src = "game.js"></script>
-    </head>
-	<body>
-		<div style="font-family:font1; position:absolute; left:-1000px; visibility:hidden;">.</div>
-	</body>
+<title>Flappy Bird</title>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&family=Sarabun:wght@200;400;600&display=swap"
+		rel="stylesheet">
+	<link rel="shortcut icon" href="assets/flappy.ico" />
+	<link rel="stylesheet" type="text/css" href="game.css">
+	<script type="text/javascript" src="phaser.min.js"></script>
+	<script type="module" src="game.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+</head>
+
+<body>
+	<div class="full flex-column">
+		<label>Instagram :</label>
+		<input class="form-control mt-2" type="text" name="username" id="username">
+		<button class="btn mt-3 form-control start" onclick="enableBackground()">เริ่มเล่นกิจกรรม</button>
+	</div>
+
+	<div id="backgroundDiv" style="font-family:font1; position:absolute; left:-1000px; visibility:hidden;">.</div>
+
+	<!-- Add this modal HTML at the end of your body -->
+	<div class="modal fade" id="leaderboardModal" tabindex="-1" role="dialog" aria-labelledby="leaderboardModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Leaderboard</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				  </div>
+				<div class="modal-body">
+					<!-- Placeholder for leaderboard content -->
+					<div id="leaderboardContent"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+		integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+		integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+		crossorigin="anonymous"></script>
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+
+	<script>
+		document.getElementById('username').value = localStorage.getItem('username')
+		function enableBackground() {
+			var usernameInput = document.getElementById('username');
+			var username = usernameInput.value.trim();
+
+			if (username !== '') {
+
+				// Store the username in localStorage
+				localStorage.setItem('username', username);
+				localStorage.setItem('bestScore', 0);
+
+
+				// Get the canvas and form elements
+				var backgroundDiv = document.querySelector('canvas');
+				var nameForm = document.querySelector('.full');
+
+				// Hide the form
+				nameForm.style.display = 'none';
+
+				// Make the canvas clickable and remove grayscale effect
+				backgroundDiv.style.pointerEvents = 'auto';
+				backgroundDiv.style.filter = 'grayscale(0%)'; // Remove grayscale effect
+			} else {
+				usernameInput.style.border = "3px solid red"
+			}
+		}
+	</script>
+</body>
+
 </html>

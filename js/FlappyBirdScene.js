@@ -1,6 +1,45 @@
 import assets from './assets.js';
 import FlappyBird from './FlappyBird.js';
 
+function displayLeaderboard(leaderboard, currentUser) {
+	const leaderboardContent = document.getElementById('leaderboardContent');
+	leaderboardContent.innerHTML = '';
+  
+	const ol = document.createElement('ol');
+	let topFiveleaderboard = leaderboard.slice(0,5)
+	topFiveleaderboard.forEach((entry, index) => {
+	  const li = document.createElement('li');
+	  li.textContent = `${index + 1}. ${entry.username} - ${entry.score} points`;
+  
+	  // Bold the name if it matches the current user
+	  if (entry.username === currentUser) {
+		li.innerHTML = `<strong>${index + 1}. ${entry.username} - ${entry.score} points</strong>`;
+	  }
+  
+	  ol.appendChild(li);
+	});
+  
+	// Display user ranking if not in the top 5
+	const userRanking = topFiveleaderboard.findIndex(entry => entry.username === currentUser);
+	if (userRanking === -1) {
+	  const dotLi = document.createElement('li');
+	  dotLi.innerHTML = `.`
+
+	  leaderboard.forEach((entry, index) => {
+		const li = document.createElement('li');
+		if (entry.username === currentUser) {
+		  li.innerHTML = `<strong>${index + 1}. ${entry.username} - ${entry.score} points</strong>`;
+		  ol.appendChild(dotLi);
+		  ol.appendChild(li);
+		} 
+	  });
+
+	}
+  
+	leaderboardContent.appendChild(ol);
+  }
+  
+  
 class FlappyBirdScene extends Phaser.Scene {
 	constructor(){
 		super("FlappyBird");
@@ -8,6 +47,8 @@ class FlappyBirdScene extends Phaser.Scene {
 
 	preload(){
 		let game = this;
+
+		this.load.html('inputForm', 'assets/inputForm.html');
 
 		// scene assets
 		this.load.image(assets.scene.background.day, 'assets/background-day.png');
@@ -20,6 +61,8 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.load.image(assets.scene.startGame, 'assets/startgame.png');
 		this.load.image(assets.scene.gameOver, 'assets/gameover.png');
 		this.load.image(assets.scene.restartGame, 'assets/restart-button.png');
+		this.load.image(assets.scene.leaderBoard, 'assets/leaderboard-button.png');
+
 		
 		[assets.obstacle.pipe.green, assets.obstacle.pipe.red].forEach(function(pipe){
 			game.load.image(pipe.top, `assets/${pipe.top}.png`);
@@ -102,8 +145,15 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.gameOver.setDepth(20);
 		this.gameOver.visible = false;
 
-		this.restart = this.add.image(assets.scene.width, 300, assets.scene.restartGame).setInteractive();
+		this.showLeaderboard = this.add.image(assets.scene.width, 290, assets.scene.leaderBoard).setInteractive();
+		this.showLeaderboard.setDisplaySize(120, 40);
+		this.showLeaderboard.setDepth(20);
+		this.showLeaderboard.visible = false;
+		this.showLeaderboard.on('pointerdown', () => this.showLeaderboardFunction(this));
+
+		this.restart = this.add.image(assets.scene.width, 340, assets.scene.restartGame).setInteractive();
 		this.restart.setDepth(20);
+		this.restart.setDisplaySize(120, 40);
 		this.restart.visible = false;
 		this.restart.on('pointerdown', () => this.restartGame(this));
 
@@ -218,19 +268,36 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.flappyBird.flap();
 	}
 
-	saveScore(){
-		let bestScore = parseInt(localStorage.getItem('bestScore'));
-		if (bestScore){
-			localStorage.setItem('bestScore', Math.max(this.score, bestScore));
-			this.bestScore.setText(bestScore);
+	saveScore() {
+		const username = localStorage.getItem('username')
+		let bestScore = parseInt(localStorage.getItem('bestScore')) || 0;
+	  
+		if (this.score > bestScore) {
+		  // Update local storage
+		  localStorage.setItem('bestScore', this.score);
+		  this.bestScore.setText(this.score);
+		  
+		  // Update backend (MySQL)
+		  // Assuming you have a route to update the score in your MySQL database
+		  fetch('/updateScore', {
+			method: 'POST',
+			headers: {
+			  'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ username: username, score: this.score }),
+		  })
+			.then(response => response.json())
+			.then(data => console.log('Score updated in MySQL:', data))
+			.catch(error => console.error('Error updating score in MySQL:', error));
 		} else {
-			localStorage.setItem('bestScore', this.score);
-			this.bestScore.setText(0);
+		  this.bestScore.setText(bestScore);
 		}
+	  
 		this.scored.setText(this.score);
 		this.scored.visible = true;
 		this.bestScore.visible = true;
-	}
+	  }
+	  
 
 	hitBird(){
 		// stop the pipes
@@ -247,6 +314,7 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.ground.anims.stop(assets.animation.ground.moving, true);
 		this.gameOver.visible = true;
 		this.restart.visible = true;
+		this.showLeaderboard.visible = true;
 		this.scoreTxt.setText('');
 	}
 
@@ -257,8 +325,27 @@ class FlappyBirdScene extends Phaser.Scene {
 		scene.gameOver.visible = false;
 		scene.scoreboard.visible = false;
 		scene.restart.visible = false;
+		scene.showLeaderboard.visible = false;
 		scene.scoreTxt.setText('0');
 		scene.initGame();
+	}
+	// Add this method in your FlappyBirdScene class
+	showLeaderboardFunction(scene) {
+			
+		const userInstagramUsername = localStorage.getItem('username');
+
+		fetch('http://localhost:3000/leaderboard')
+			.then(response => response.json())
+			.then(data => {
+				$('#leaderboardModal').modal('show');	
+				const leaderboardData = data.leaderboard; 
+
+				displayLeaderboard(data.leaderboard, userInstagramUsername);
+
+				leaderboardData.sort((a, b) => b.score - a.score);
+			})
+			.catch(error => console.error('Error fetching leaderboard:', error));
+			
 	}
 
 	updateScore(_, gap){
